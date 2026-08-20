@@ -1,0 +1,130 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Registered user profile with role, contact info and defaults",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "email": { "type": "string", "description": "User email address" },
+        "displayName": { "type": "string", "description": "User display name" },
+        "photoURL": { "type": "string", "description": "Profile picture URL" },
+        "phone": { "type": "string", "description": "Contact phone number in Nashik" },
+        "role": { "type": "string", "enum": ["customer", "provider", "operations"], "description": "Application permission role" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "lastLoginAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email"]
+    },
+    "Address": {
+      "title": "Address",
+      "description": "Saved customer address in Nashik",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string", "description": "Owner user UID" },
+        "title": { "type": "string", "description": "Label like Home, Office, Parents" },
+        "line1": { "type": "string", "description": "Street address / Building" },
+        "locality": { "type": "string", "description": "Nashik locality (e.g. Gangapur Road)" },
+        "city": { "type": "string", "default": "Nashik" },
+        "pincode": { "type": "string" },
+        "landmark": { "type": "string" },
+        "isDefault": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "title", "line1", "locality", "pincode"]
+    },
+    "Booking": {
+      "title": "Booking",
+      "description": "Household service booking with 1-Day Promise SLA tracking",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "userName": { "type": "string" },
+        "userPhone": { "type": "string" },
+        "primaryServiceTitle": { "type": "string" },
+        "primaryServiceImage": { "type": "string" },
+        "category": { "type": "string" },
+        "items": { "type": "array" },
+        "address": { "type": "object" },
+        "date": { "type": "string" },
+        "timeSlot": { "type": "string" },
+        "status": { "type": "string" },
+        "statusHistory": { "type": "array" },
+        "provider": { "type": "object" },
+        "bill": { "type": "object" },
+        "paymentMethod": { "type": "string" },
+        "paymentStatus": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "promiseDeadline": { "type": "string" },
+        "otp": { "type": "string" },
+        "userRating": { "type": "number" },
+        "userReview": { "type": "string" }
+      },
+      "required": ["id", "userId", "primaryServiceTitle", "category", "address", "status", "bill"]
+    },
+    "Review": {
+      "title": "Review",
+      "description": "Verified customer feedback for Nashik service bookings",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "bookingId": { "type": "string" },
+        "serviceId": { "type": "string" },
+        "userId": { "type": "string" },
+        "author": { "type": "string" },
+        "locality": { "type": "string" },
+        "rating": { "type": "number" },
+        "comment": { "type": "string" },
+        "serviceTitle": { "type": "string" },
+        "verified": { "type": "boolean" },
+        "avatarInitials": { "type": "string" },
+        "avatarColor": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "author", "rating", "comment", "serviceTitle"]
+    },
+    "SupportTicket": {
+      "title": "SupportTicket",
+      "description": "Customer assistance ticket with chat messages",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "userName": { "type": "string" },
+        "bookingId": { "type": "string" },
+        "subject": { "type": "string" },
+        "category": { "type": "string" },
+        "status": { "type": "string", "enum": ["Open", "In Progress", "Resolved"] },
+        "lastUpdated": { "type": "string" },
+        "messages": { "type": "array" }
+      },
+      "required": ["id", "subject", "category", "status", "messages"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile documents"
+    },
+    "/addresses/{addressId}": {
+      "schema": "Address",
+      "description": "Saved service locations"
+    },
+    "/bookings/{bookingId}": {
+      "schema": "Booking",
+      "description": "Service orders and job lifecycle logs"
+    },
+    "/reviews/{reviewId}": {
+      "schema": "Review",
+      "description": "Customer reviews and feedback"
+    },
+    "/supportTickets/{ticketId}": {
+      "schema": "SupportTicket",
+      "description": "Customer support requests"
+    }
+  }
+}

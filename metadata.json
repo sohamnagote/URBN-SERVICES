@@ -1,0 +1,6 @@
+{
+  "name": "URBN Services",
+  "description": "Nashik-first local household services marketplace for plumbing, electrical, cleaning, AC service, and appliance repair with 1-Day Service Promise.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

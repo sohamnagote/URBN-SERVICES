@@ -1,0 +1,43 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if isOwner(userId) || !isAuthenticated();
+    }
+
+    // Addresses Collection
+    match /addresses/{addressId} {
+      allow read: if true;
+      allow create, update, delete: if true;
+    }
+
+    // Bookings Collection
+    match /bookings/{bookingId} {
+      allow read: if true;
+      allow create, update, delete: if true;
+    }
+
+    // Reviews Collection
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create, update: if true;
+      allow delete: if isAuthenticated();
+    }
+
+    // Support Tickets
+    match /supportTickets/{ticketId} {
+      allow read, write: if true;
+    }
+  }
+}
