@@ -1,4 +1,13 @@
-export type CategoryId = 'plumbing' | 'electrical' | 'cleaning' | 'appliance' | 'ac' | 'carpenter' | 'painting';
+export type CategoryId =
+  | 'plumbing'
+  | 'electrical'
+  | 'cleaning'
+  | 'appliance'
+  | 'ac'
+  | 'carpenter'
+  | 'painting'
+  | 'pest_control'
+  | 'maintenance';
 
 export interface ServiceItem {
   id: string;
@@ -100,6 +109,7 @@ export interface BillBreakdown {
 
 export interface Booking {
   id: string;
+  userId?: string;
   items: CartItem[];
   primaryServiceTitle: string;
   primaryServiceImage: string;

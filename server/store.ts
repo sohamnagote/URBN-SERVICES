@@ -11,7 +11,6 @@ import {
   Review,
   SupportTicket,
 } from '../src/types';
-import { DEFAULT_ADDRESSES, DEFAULT_PROVIDER, INITIAL_BOOKINGS, MOCK_REVIEWS, SERVICE_CATEGORIES } from '../src/data/mockData';
 
 export const AUTHORIZED_ADMIN_EMAILS = new Set<string>([
   'someshnagote14@gmail.com',
@@ -177,150 +176,15 @@ class BackendStore {
   }
 
   private seedInitial() {
-    // Seed initial bookings
-    INITIAL_BOOKINGS.forEach((b) => {
-      this.bookings.set(b.id, { ...b });
-    });
-
-    // Seed initial reviews
-    MOCK_REVIEWS.forEach((r) => {
-      this.reviews.set(r.id, { ...r });
-    });
-
-    // Seed default provider record
-    this.providers.set(DEFAULT_PROVIDER.id, {
-      ...DEFAULT_PROVIDER,
-      userId: 'provider-ramesh-1',
-      email: 'ramesh.jadhav@urbnservices.in',
-      verificationStatus: 'Approved',
-      isOnline: true,
-      categories: ['plumbing', 'appliance', 'ac'],
-      serviceAreas: ['Gangapur Road', 'College Road', 'Mahatma Nagar', 'Panchavati'],
-      totalJobsCompleted: 124,
-      grossEarnings: 74200,
-      platformCommission: 11130,
-      netEarnings: 63070,
-      payoutStatus: 'Processed',
-    });
-
-    // Seed secondary provider
-    this.providers.set('prov-suresh-2', {
-      id: 'prov-suresh-2',
-      name: 'Suresh Patil',
-      profession: 'Master Electrician',
-      rating: 4.92,
-      reviewsCount: 98,
-      phone: '+91 98221 44556',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=250',
-      verified: true,
-      etaMinutes: 16,
-      vehicleType: 'Bajaj Pulsar 150',
-      vehicleNumber: 'MH 15 DP 7711',
-      currentLocationName: 'Indira Nagar Circle, Nashik',
-      coords: { lat: 19.968, lng: 73.782 },
-      userId: 'provider-suresh-2',
-      email: 'suresh.patil@urbnservices.in',
-      verificationStatus: 'Approved',
-      isOnline: true,
-      categories: ['electrical', 'appliance'],
-      serviceAreas: ['Indira Nagar', 'Mumbai Naka', 'Nashik Road'],
-      totalJobsCompleted: 89,
-      grossEarnings: 53400,
-      platformCommission: 8010,
-      netEarnings: 45390,
-      payoutStatus: 'Processed',
-    });
-
-    // Seed initial provider applications in review pipeline
-    this.providerApplications.set('app-pravin-101', {
-      id: 'app-pravin-101',
-      userId: 'user-pravin-shinde',
-      applicantName: 'Pravin Shinde',
-      email: 'pravin.ac.nashik@gmail.com',
-      phone: '+91 98902 33441',
-      experienceYears: 6,
-      primaryCategory: 'ac',
-      offeredCategories: ['ac', 'appliance'],
-      serviceAreas: ['Gangapur Road', 'College Road', 'Mahatma Nagar'],
-      vehicleType: 'Honda Activa 6G',
-      vehicleNumber: 'MH 15 FG 4912',
-      governmentIdType: 'Aadhaar Card',
-      governmentIdNumber: 'XXXX-XXXX-8921',
-      status: 'Under Review',
-      appliedAt: new Date(Date.now() - 3 * 3600 * 1000).toISOString(),
-      internalNotes: 'Aadhaar verified. Awaiting certificate verification for Daikin & Voltas AC servicing.',
-    });
-
-    this.providerApplications.set('app-ganesh-102', {
-      id: 'app-ganesh-102',
-      userId: 'user-ganesh-kale',
-      applicantName: 'Ganesh Kale',
-      email: 'ganesh.carpenter@yahoo.com',
-      phone: '+91 94222 78109',
-      experienceYears: 9,
-      primaryCategory: 'carpenter',
-      offeredCategories: ['carpenter'],
-      serviceAreas: ['Panchavati', 'Nashik Road', 'Mumbai Naka'],
-      vehicleType: 'TVS Jupiter',
-      vehicleNumber: 'MH 15 EZ 1092',
-      governmentIdType: 'PAN Card',
-      governmentIdNumber: 'XXXXX9012K',
-      status: 'Application Submitted',
-      appliedAt: new Date(Date.now() - 1 * 3600 * 1000).toISOString(),
-    });
-
-    // Seed initial administrative event notifications
-    this.notifications = [
-      {
-        id: 'notif-1',
-        category: 'New Provider Application',
-        priority: 'high',
-        title: 'New Provider Onboarding Application',
-        message: 'Pravin Shinde submitted an application for AC & Appliance repair in Gangapur Road.',
-        timestamp: new Date(Date.now() - 25 * 60 * 1000).toISOString(),
-        read: false,
-        relatedApplicationId: 'app-pravin-101',
-      },
-      {
-        id: 'notif-2',
-        category: 'New Booking',
-        priority: 'medium',
-        title: 'New Express Booking Created',
-        message: 'Booking UB-89421 created for Bathroom Deep Cleaning in College Road.',
-        timestamp: new Date(Date.now() - 40 * 60 * 1000).toISOString(),
-        read: false,
-        relatedBookingId: 'UB-89421',
-      },
-      {
-        id: 'notif-3',
-        category: 'SLA Risk',
-        priority: 'high',
-        title: '1-Day Promise SLA Check',
-        message: 'All 7 active Nashik bookings are running within 1-Day Promise SLA parameters (100% on schedule).',
-        timestamp: new Date(Date.now() - 75 * 60 * 1000).toISOString(),
-        read: true,
-      },
-      {
-        id: 'notif-4',
-        category: 'Provider Arrived',
-        priority: 'low',
-        title: 'Technician Arrived at Location',
-        message: 'Ramesh Jadhav reached customer location in Gangapur Road. Awaiting OTP verification.',
-        timestamp: new Date(Date.now() - 110 * 60 * 1000).toISOString(),
-        read: true,
-        relatedBookingId: 'UB-94821',
-        relatedProviderId: DEFAULT_PROVIDER.id,
-      },
-    ];
-
-    // Initial audit log
+    // Clean production state: No seeded fake bookings, reviews, providers, applications, or fake notifications.
+    // Initial audit log to mark cluster initialization
     this.recordAudit({
       actorId: 'system',
       actorRole: 'system',
       action: 'SYSTEM_BOOTSTRAP',
       resource: 'backend_store',
       resourceId: 'nashik_cluster',
-      reason: 'URBN SERVICES Multi-Role RBAC & Command Center Initialized',
+      reason: 'URBN SERVICES Multi-Role RBAC & Command Center Initialized in Clean Production State',
     });
   }
 

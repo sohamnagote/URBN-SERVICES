@@ -251,43 +251,50 @@ export const CategoryScreen: React.FC<CategoryScreenProps> = ({
           </div>
         </section>
 
-        {/* Nashik Resident Reviews (Matching Screenshots) */}
+        {/* Nashik Resident Reviews */}
         <section className="space-y-3 pt-2">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold text-[#191c1e] tracking-tight">Nashik Resident Reviews</h2>
             <div className="flex items-center text-xs font-bold text-[#006e2f]">
-              <Star className="w-3.5 h-3.5 fill-[#006e2f] mr-1" /> 4.8 / 5 Rating
+              <Star className="w-3.5 h-3.5 fill-[#006e2f] mr-1" /> {reviewsForCategory.length > 0 ? '4.8 / 5 Rating' : 'Verified Reviews'}
             </div>
           </div>
 
           <div className="space-y-3">
-            {reviewsForCategory.slice(0, 2).map((rev) => (
-              <div
-                key={rev.id}
-                className="bg-white border border-[#c3c6d6]/70 rounded-2xl p-4 shadow-2xs space-y-2"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <div
-                      className={`w-7 h-7 rounded-full ${rev.avatarColor} text-white text-xs font-bold flex items-center justify-center`}
-                    >
-                      {rev.avatarInitials}
+            {reviewsForCategory.length > 0 ? (
+              reviewsForCategory.slice(0, 2).map((rev) => (
+                <div
+                  key={rev.id}
+                  className="bg-white border border-[#c3c6d6]/70 rounded-2xl p-4 shadow-2xs space-y-2"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div
+                        className={`w-7 h-7 rounded-full ${rev.avatarColor} text-white text-xs font-bold flex items-center justify-center`}
+                      >
+                        {rev.avatarInitials}
+                      </div>
+                      <div>
+                        <span className="text-xs font-bold text-gray-900 block">{rev.author}</span>
+                        <span className="text-[10px] text-gray-400">{rev.locality}</span>
+                      </div>
                     </div>
-                    <div>
-                      <span className="text-xs font-bold text-gray-900 block">{rev.author}</span>
-                      <span className="text-[10px] text-gray-400">{rev.locality}</span>
+                    <div className="flex items-center text-amber-500">
+                      {[...Array(rev.rating)].map((_, i) => (
+                        <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />
+                      ))}
+                      <span className="text-[11px] text-gray-400 ml-1.5">{rev.timeAgo}</span>
                     </div>
                   </div>
-                  <div className="flex items-center text-amber-500">
-                    {[...Array(rev.rating)].map((_, i) => (
-                      <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />
-                    ))}
-                    <span className="text-[11px] text-gray-400 ml-1.5">{rev.timeAgo}</span>
-                  </div>
+                  <p className="text-xs text-[#434654] italic leading-relaxed">"{rev.comment}"</p>
                 </div>
-                <p className="text-xs text-[#434654] italic leading-relaxed">"{rev.comment}"</p>
+              ))
+            ) : (
+              <div className="bg-white border border-dashed border-[#c3c6d6] rounded-2xl p-5 text-center">
+                <p className="text-xs text-gray-500">No verified reviews submitted yet for this category.</p>
+                <p className="text-[11px] text-[#003d9b] font-medium mt-1">Book a service and share your experience with Nashik residents!</p>
               </div>
-            ))}
+            )}
           </div>
         </section>
       </main>

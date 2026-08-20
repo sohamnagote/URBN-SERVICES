@@ -48,7 +48,7 @@ export const ProviderDashboard: React.FC<ProviderDashboardProps> = ({
 
   // Dynamic earnings calculations
   const grossCompletedEarnings = completedJobs.reduce(
-    (acc, job) => acc + (job.bill?.total || 499),
+    (acc, job) => acc + (job.bill?.total || 0),
     0
   );
   const platformCommission = Math.round(grossCompletedEarnings * 0.15);
@@ -65,7 +65,7 @@ export const ProviderDashboard: React.FC<ProviderDashboardProps> = ({
   };
 
   const handleVerifyStart = async (booking: Booking) => {
-    if (selectedOtp === (booking.otp || '4829') || selectedOtp === '4829') {
+    if (booking.otp && selectedOtp === booking.otp) {
       try {
         await apiClient.verifyBookingOtp(booking.id, selectedOtp, DEFAULT_PROVIDER.id);
       } catch (e) {
@@ -76,18 +76,19 @@ export const ProviderDashboard: React.FC<ProviderDashboardProps> = ({
       setSelectedOtp('');
       setErrorMsg('');
     } else {
-      setErrorMsg('Incorrect customer OTP. Ask the resident on site.');
+      setErrorMsg('Incorrect customer OTP. Please check with resident on site.');
     }
   };
 
   const handleRequestPayout = async () => {
+    if (netEarnings <= 0) return;
     setIsProcessingPayout(true);
     setPayoutSuccess('');
     try {
       await apiClient.initiateProviderPayout(DEFAULT_PROVIDER.id);
-      setPayoutSuccess(`Instant payout of ₹${netEarnings || 1146} transferred to HDFC Bank A/C **4091 via UPI.`);
+      setPayoutSuccess(`Instant payout of ₹${netEarnings} transferred to registered partner account via UPI.`);
     } catch (e) {
-      setPayoutSuccess(`Instant payout of ₹${netEarnings || 1146} transferred to HDFC Bank A/C **4091 via UPI.`);
+      setPayoutSuccess(`Instant payout of ₹${netEarnings} transferred to registered partner account via UPI.`);
     } finally {
       setIsProcessingPayout(false);
     }
@@ -241,18 +242,26 @@ export const ProviderDashboard: React.FC<ProviderDashboardProps> = ({
       {/* Tab 2: Completed Jobs */}
       {activeTab === 'completed' && (
         <div className="space-y-3">
-          {completedJobs.map((b) => (
-            <div key={b.id} className="bg-white border border-gray-200 rounded-2xl p-4 flex justify-between items-center">
-              <div>
-                <h4 className="font-bold text-sm text-gray-900">{b.primaryServiceTitle}</h4>
-                <p className="text-xs text-gray-500">{b.address.locality} • ₹{b.bill.total}</p>
-                <span className="text-[10px] text-green-700 font-semibold">1-Day Promise Honored</span>
+          {completedJobs.length > 0 ? (
+            completedJobs.map((b) => (
+              <div key={b.id} className="bg-white border border-gray-200 rounded-2xl p-4 flex justify-between items-center">
+                <div>
+                  <h4 className="font-bold text-sm text-gray-900">{b.primaryServiceTitle}</h4>
+                  <p className="text-xs text-gray-500">{b.address.locality} • ₹{b.bill.total}</p>
+                  <span className="text-[10px] text-green-700 font-semibold">1-Day Promise Honored</span>
+                </div>
+                <span className="text-xs font-bold bg-green-100 text-[#006e2f] px-2.5 py-1 rounded-full">
+                  Completed
+                </span>
               </div>
-              <span className="text-xs font-bold bg-green-100 text-[#006e2f] px-2.5 py-1 rounded-full">
-                Completed
-              </span>
+            ))
+          ) : (
+            <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
+              <CheckCircle2 className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+              <h3 className="font-bold text-gray-800 text-sm">No Completed Jobs Yet</h3>
+              <p className="text-xs text-gray-500 mt-1">Completed bookings will appear here after customer OTP verification.</p>
             </div>
-          ))}
+          )}
         </div>
       )}
 
@@ -271,15 +280,15 @@ export const ProviderDashboard: React.FC<ProviderDashboardProps> = ({
           <div className="grid grid-cols-3 gap-3">
             <div className="p-3.5 bg-blue-50/70 border border-blue-100 rounded-xl">
               <span className="text-[10px] text-gray-500 font-medium">Gross Bookings</span>
-              <p className="text-lg font-extrabold text-gray-900 mt-1">₹{grossCompletedEarnings || 1350}</p>
+              <p className="text-lg font-extrabold text-gray-900 mt-1">₹{grossCompletedEarnings}</p>
             </div>
             <div className="p-3.5 bg-amber-50/70 border border-amber-100 rounded-xl">
               <span className="text-[10px] text-amber-700 font-medium">URBN Comm (15%)</span>
-              <p className="text-lg font-extrabold text-amber-700 mt-1">-₹{platformCommission || 204}</p>
+              <p className="text-lg font-extrabold text-amber-700 mt-1">-₹{platformCommission}</p>
             </div>
             <div className="p-3.5 bg-green-50/70 border border-green-100 rounded-xl">
               <span className="text-[10px] text-green-700 font-medium">Net Payout</span>
-              <p className="text-lg font-extrabold text-[#006e2f] mt-1">₹{netEarnings || 1146}</p>
+              <p className="text-lg font-extrabold text-[#006e2f] mt-1">₹{netEarnings}</p>
             </div>
           </div>
 
@@ -291,14 +300,18 @@ export const ProviderDashboard: React.FC<ProviderDashboardProps> = ({
           ) : (
             <button
               onClick={handleRequestPayout}
-              disabled={isProcessingPayout}
-              className="w-full bg-[#003d9b] hover:bg-blue-800 text-white text-xs font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 shadow-2xs cursor-pointer"
+              disabled={isProcessingPayout || netEarnings <= 0}
+              className={`w-full text-xs font-bold py-3 rounded-xl transition-all flex items-center justify-center gap-2 shadow-2xs ${
+                netEarnings > 0 && !isProcessingPayout
+                  ? 'bg-[#003d9b] hover:bg-blue-800 text-white cursor-pointer'
+                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              }`}
             >
               {isProcessingPayout ? 'Processing Instant Transfer...' : 'Initiate Instant UPI Payout'}
             </button>
           )}
 
-          <p className="text-[11px] text-gray-400 text-center">Settled directly via IMPS to HDFC Bank (A/C **4091)</p>
+          <p className="text-[11px] text-gray-400 text-center">Settled directly via IMPS to registered verified bank account</p>
         </div>
       )}
 
@@ -318,7 +331,7 @@ export const ProviderDashboard: React.FC<ProviderDashboardProps> = ({
           <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl border border-gray-100 text-center">
             <h3 className="font-bold text-gray-900 text-base">Enter Customer 4-Digit OTP</h3>
             <p className="text-xs text-gray-500 mt-1">
-              Ask resident for the verification code on their URBN app (e.g. 4829)
+              Ask resident for the 4-digit code displayed in their live tracking screen
             </p>
 
             <input
@@ -326,7 +339,7 @@ export const ProviderDashboard: React.FC<ProviderDashboardProps> = ({
               maxLength={4}
               value={selectedOtp}
               onChange={(e) => setSelectedOtp(e.target.value)}
-              placeholder="4829"
+              placeholder="••••"
               className="text-center font-mono text-2xl font-bold tracking-widest border border-gray-300 rounded-xl p-3 my-4 w-36 mx-auto block focus:outline-none focus:border-[#003d9b]"
             />
 

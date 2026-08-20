@@ -18,6 +18,9 @@ import {
   Radio,
   Navigation,
   ArrowRight,
+  Hammer,
+  Paintbrush,
+  Shield,
 } from 'lucide-react';
 import { CategoryId, ServiceCategory, ServiceItem } from '../types';
 import { SERVICE_CATEGORIES } from '../data/mockData';
@@ -60,6 +63,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         return <Cpu className="w-6 h-6" />;
       case 'ac':
         return <Snowflake className="w-6 h-6" />;
+      case 'carpenter':
+        return <Hammer className="w-6 h-6" />;
+      case 'painting':
+        return <Paintbrush className="w-6 h-6" />;
+      case 'pest_control':
+        return <Shield className="w-6 h-6" />;
+      case 'maintenance':
+        return <Wrench className="w-6 h-6" />;
       default:
         return <Wrench className="w-6 h-6" />;
     }
@@ -282,6 +293,54 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             </span>
             <span className="text-sm font-bold text-[#191c1e] group-hover:text-[#003d9b]">AC Service</span>
             <span className="text-[11px] text-gray-500 mt-0.5">Jet Wash, Gas Refill</span>
+          </div>
+
+          <div
+            id="category-card-carpenter"
+            onClick={() => onSelectCategory('carpenter')}
+            className="bg-white border border-[#c3c6d6] rounded-2xl p-5 hover:border-[#003d9b] hover:shadow-sm transition-all group flex flex-col items-center text-center cursor-pointer justify-center min-h-[140px]"
+          >
+            <span className="bg-[#f2f4f6] text-[#003d9b] p-4 rounded-2xl mb-3 group-hover:bg-[#dae2ff] transition-colors">
+              <Hammer className="w-6 h-6" />
+            </span>
+            <span className="text-sm font-bold text-[#191c1e] group-hover:text-[#003d9b]">Carpenter</span>
+            <span className="text-[11px] text-gray-500 mt-0.5">Locks, Furniture, Drill</span>
+          </div>
+
+          <div
+            id="category-card-painting"
+            onClick={() => onSelectCategory('painting')}
+            className="bg-white border border-[#c3c6d6] rounded-2xl p-5 hover:border-[#003d9b] hover:shadow-sm transition-all group flex flex-col items-center text-center cursor-pointer justify-center min-h-[140px]"
+          >
+            <span className="bg-[#f2f4f6] text-[#003d9b] p-4 rounded-2xl mb-3 group-hover:bg-[#dae2ff] transition-colors">
+              <Paintbrush className="w-6 h-6" />
+            </span>
+            <span className="text-sm font-bold text-[#191c1e] group-hover:text-[#003d9b]">Painting</span>
+            <span className="text-[11px] text-gray-500 mt-0.5">Touch-up, Waterproof</span>
+          </div>
+
+          <div
+            id="category-card-pest_control"
+            onClick={() => onSelectCategory('pest_control')}
+            className="bg-white border border-[#c3c6d6] rounded-2xl p-5 hover:border-[#003d9b] hover:shadow-sm transition-all group flex flex-col items-center text-center cursor-pointer justify-center min-h-[140px]"
+          >
+            <span className="bg-[#f2f4f6] text-[#003d9b] p-4 rounded-2xl mb-3 group-hover:bg-[#dae2ff] transition-colors">
+              <Shield className="w-6 h-6" />
+            </span>
+            <span className="text-sm font-bold text-[#191c1e] group-hover:text-[#003d9b]">Pest Control</span>
+            <span className="text-[11px] text-gray-500 mt-0.5">Cockroach, Termite</span>
+          </div>
+
+          <div
+            id="category-card-maintenance"
+            onClick={() => onSelectCategory('maintenance')}
+            className="bg-white border border-[#c3c6d6] rounded-2xl p-5 hover:border-[#003d9b] hover:shadow-sm transition-all group flex flex-col items-center text-center cursor-pointer justify-center min-h-[140px]"
+          >
+            <span className="bg-[#f2f4f6] text-[#003d9b] p-4 rounded-2xl mb-3 group-hover:bg-[#dae2ff] transition-colors">
+              <Wrench className="w-6 h-6" />
+            </span>
+            <span className="text-sm font-bold text-[#191c1e] group-hover:text-[#003d9b]">Maintenance</span>
+            <span className="text-[11px] text-gray-500 mt-0.5">Mounting, Grouting</span>
           </div>
         </div>
       </section>

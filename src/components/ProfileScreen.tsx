@@ -128,14 +128,15 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     }
   };
 
-  const userDisplayName = currentUser?.displayName || 'Rahul Deshmukh';
-  const userEmail = currentUser?.email || 'someshnagote14@gmail.com';
+  const userDisplayName = currentUser?.displayName || (currentUser ? 'User' : 'Guest Resident');
+  const userEmail = currentUser?.email || (currentUser ? 'User Account' : 'Not signed in');
   const userInitials = userDisplayName
     .split(' ')
     .map((n) => n[0])
+    .filter(Boolean)
     .join('')
     .substring(0, 2)
-    .toUpperCase();
+    .toUpperCase() || 'G';
 
   return (
     <div id="profile-screen" className="max-w-[768px] mx-auto px-4 md:px-8 py-5 pb-28 animate-in fade-in duration-200">

@@ -15,7 +15,7 @@ import {
   Building,
 } from 'lucide-react';
 import { Address, BillBreakdown, CartItem, ServiceItem } from '../types';
-import { AVAILABLE_COUPONS, AVAILABLE_SLOTS, DEFAULT_ADDRESSES } from '../data/mockData';
+import { AVAILABLE_COUPONS, AVAILABLE_SLOTS } from '../data/mockData';
 
 interface ConfirmBookingScreenProps {
   cartItems: CartItem[];
@@ -38,26 +38,26 @@ export const ConfirmBookingScreen: React.FC<ConfirmBookingScreenProps> = ({
   onBack,
   onConfirmBooking,
 }) => {
-  const [selectedSlotIndex, setSelectedSlotIndex] = useState(1); // Tomorrow 10:00 AM - 11:30 AM default
+  const [selectedSlotIndex, setSelectedSlotIndex] = useState(1);
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [showSlotModal, setShowSlotModal] = useState(false);
-  const [appliedCoupon, setAppliedCoupon] = useState<string>('NASHIK50');
+  const [appliedCoupon, setAppliedCoupon] = useState<string>('');
   const [customCoupon, setCustomCoupon] = useState('');
-  const [couponMsg, setCouponMsg] = useState('Coupon NASHIK50 applied (₹50 off)');
+  const [couponMsg, setCouponMsg] = useState('');
   const [paymentMethod, setPaymentMethod] = useState<'UPI' | 'Card' | 'Cash on Service'>('UPI');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const selectedSlot = AVAILABLE_SLOTS[selectedSlotIndex];
+  const selectedSlot = AVAILABLE_SLOTS[selectedSlotIndex] || AVAILABLE_SLOTS[0];
 
-  // Calculate bill breakdown matching screenshot
+  // Calculate bill breakdown
   const rawLabor = cartItems.reduce(
     (acc, curr) => acc + curr.service.price * curr.quantity,
     0
   );
-  const serviceVisitCharge = 299;
-  const estimatedLabor = rawLabor > 0 ? rawLabor : 300;
+  const serviceVisitCharge = 199;
+  const estimatedLabor = rawLabor;
   const discountAmount = appliedCoupon === 'NASHIK50' ? 50 : appliedCoupon === 'FIRSTURBN' ? 100 : 0;
-  const taxesAndFee = 49;
+  const taxesAndFee = Math.round((serviceVisitCharge + estimatedLabor) * 0.05);
   const grandTotal = Math.max(0, serviceVisitCharge + estimatedLabor - discountAmount + taxesAndFee);
 
   const billBreakdown: BillBreakdown = {
@@ -66,16 +66,10 @@ export const ConfirmBookingScreen: React.FC<ConfirmBookingScreenProps> = ({
     platformDiscount: discountAmount,
     taxesAndFee,
     total: grandTotal,
-    couponApplied: appliedCoupon,
+    couponApplied: appliedCoupon || undefined,
   };
 
-  const primaryItem = cartItems[0]?.service || {
-    title: 'Bathroom Tap Repair',
-    shortDesc: 'Expert plumbing service',
-    rating: 4.8,
-    image:
-      'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80',
-  };
+  const primaryItem = cartItems[0]?.service;
 
   const handleApplyCoupon = (code: string) => {
     const found = AVAILABLE_COUPONS.find((c) => c.code.toUpperCase() === code.toUpperCase());

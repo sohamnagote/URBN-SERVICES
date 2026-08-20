@@ -66,13 +66,7 @@ export const LiveBookingTracker: React.FC<LiveBookingTrackerProps> = ({
   };
 
   // Chat message state
-  const [messages, setMessages] = useState([
-    {
-      sender: 'pro',
-      text: `Namaskar! I am Ramesh from URBN SERVICES. I have taken the Nashik-Pune highway route and will arrive in 10-12 minutes.`,
-      time: '11:15 AM',
-    },
-  ]);
+  const [messages, setMessages] = useState<Array<{ sender: string; text: string; time: string }>>([]);
   const [inputMsg, setInputMsg] = useState('');
 
   const isOngoing = booking.status === 'On the Way' || booking.status === 'Started';
@@ -83,27 +77,15 @@ export const LiveBookingTracker: React.FC<LiveBookingTrackerProps> = ({
     const newMsg = { sender: 'user', text: inputMsg.trim(), time: 'Just now' };
     setMessages((prev) => [...prev, newMsg]);
     setInputMsg('');
-
-    // Pro auto-reply simulation
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender: 'pro',
-          text: 'Got it! I am carrying all standard spare parts & leak sealers. See you shortly.',
-          time: 'Just now',
-        },
-      ]);
-    }, 1200);
   };
 
   const handleVerifyOtp = () => {
-    if (otpInput === (booking.otp || '4829')) {
+    if (booking.otp && otpInput === booking.otp) {
       onUpdateBookingStatus(booking.id, 'Started');
       setShowOtpModal(false);
       setOtpError('');
     } else {
-      setOtpError('Invalid OTP. Please enter the 4-digit code shown below.');
+      setOtpError('Invalid OTP. Please enter the exact 4-digit code shown for this service.');
     }
   };
 

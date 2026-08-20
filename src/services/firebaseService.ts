@@ -14,7 +14,6 @@ import {
   serverTimestamp,
 } from '../lib/firebase';
 import { Address, Booking, BookingStatus, BookingStatusStep, Review, SupportTicket } from '../types';
-import { DEFAULT_ADDRESSES, INITIAL_BOOKINGS, MOCK_REVIEWS as REVIEWS_DATA } from '../data/mockData';
 
 // Firestore collection names
 const BOOKINGS_COLLECTION = 'bookings';
@@ -23,52 +22,10 @@ const REVIEWS_COLLECTION = 'reviews';
 const TICKETS_COLLECTION = 'supportTickets';
 
 /**
- * Initialize / Seed default data in Firestore if collection is empty
+ * Initialize / Seed default data in Firestore if needed (No fake user data seeded in production)
  */
-export async function seedInitialDataIfNeeded(userId?: string) {
-  try {
-    // Check and seed reviews
-    const reviewsSnap = await getDocs(collection(db, REVIEWS_COLLECTION));
-    if (reviewsSnap.empty) {
-      for (const rev of REVIEWS_DATA) {
-        await setDoc(doc(db, REVIEWS_COLLECTION, rev.id), {
-          ...rev,
-          createdAt: new Date().toISOString(),
-        });
-      }
-    }
-
-    // Check and seed default addresses for user (or demo user)
-    const effectiveUserId = userId || 'demo-user-nashik';
-    const addrQuery = query(
-      collection(db, ADDRESSES_COLLECTION),
-      where('userId', '==', effectiveUserId)
-    );
-    const addrSnap = await getDocs(addrQuery);
-    if (addrSnap.empty) {
-      for (const addr of DEFAULT_ADDRESSES) {
-        await setDoc(doc(db, ADDRESSES_COLLECTION, addr.id), {
-          ...addr,
-          userId: effectiveUserId,
-          createdAt: new Date().toISOString(),
-        });
-      }
-    }
-
-    // Check and seed initial bookings
-    const bookingsSnap = await getDocs(collection(db, BOOKINGS_COLLECTION));
-    if (bookingsSnap.empty) {
-      for (const b of INITIAL_BOOKINGS) {
-        await setDoc(doc(db, BOOKINGS_COLLECTION, b.id), {
-          ...b,
-          userId: effectiveUserId,
-          createdAt: b.createdAt || new Date().toISOString(),
-        });
-      }
-    }
-  } catch (error) {
-    console.warn('Firestore seeding check (non-blocking):', error);
-  }
+export async function seedInitialDataIfNeeded(_userId?: string): Promise<void> {
+  // Clean production state: No mock or fake user data is seeded into Firestore.
 }
 
 /**
@@ -81,14 +38,15 @@ export function subscribeBookings(
 ) {
   try {
     const coll = collection(db, BOOKINGS_COLLECTION);
-    // Ops and Providers can see all bookings in Nashik; customers see their own or all for demo
-    const q = query(coll);
+    const q = userId && role === 'customer'
+      ? query(coll, where('userId', '==', userId))
+      : query(coll);
 
     return onSnapshot(
       q,
       (snapshot) => {
         if (snapshot.empty) {
-          onData(INITIAL_BOOKINGS);
+          onData([]);
           return;
         }
         const list: Booking[] = [];
@@ -101,12 +59,12 @@ export function subscribeBookings(
       },
       (error) => {
         console.error('Firestore bookings listener error:', error);
-        onData(INITIAL_BOOKINGS);
+        onData([]);
       }
     );
   } catch (err) {
     console.error('Failed to subscribe bookings:', err);
-    onData(INITIAL_BOOKINGS);
+    onData([]);
     return () => {};
   }
 }
@@ -118,7 +76,7 @@ export async function createBookingInFirestore(booking: Booking, userId?: string
   const docRef = doc(db, BOOKINGS_COLLECTION, booking.id);
   await setDoc(docRef, {
     ...booking,
-    userId: userId || 'demo-user-nashik',
+    userId: userId || booking.userId || 'guest_user',
     createdAt: new Date().toISOString(),
     serverCreatedAt: serverTimestamp(),
   });
@@ -178,7 +136,7 @@ export async function submitBookingReviewInFirestore(
   await setDoc(reviewRef, {
     ...newReview,
     bookingId,
-    userId: userId || 'demo-user-nashik',
+    userId: userId || 'guest_user',
     createdAt: new Date().toISOString(),
   });
 }
@@ -198,23 +156,23 @@ export function subscribeAddresses(
       q,
       (snapshot) => {
         if (snapshot.empty) {
-          onData(DEFAULT_ADDRESSES);
+          onData([]);
           return;
         }
         const list: Address[] = [];
         snapshot.forEach((docSnap) => {
           list.push(docSnap.data() as Address);
         });
-        onData(list.length > 0 ? list : DEFAULT_ADDRESSES);
+        onData(list);
       },
       (err) => {
         console.error('Firestore addresses error:', err);
-        onData(DEFAULT_ADDRESSES);
+        onData([]);
       }
     );
   } catch (err) {
     console.error('Failed to subscribe addresses:', err);
-    onData(DEFAULT_ADDRESSES);
+    onData([]);
     return () => {};
   }
 }
@@ -226,7 +184,7 @@ export async function saveAddressToFirestore(address: Address, userId?: string):
   const docRef = doc(db, ADDRESSES_COLLECTION, address.id);
   await setDoc(docRef, {
     ...address,
-    userId: userId || 'demo-user-nashik',
+    userId: userId || 'guest_user',
     createdAt: new Date().toISOString(),
   });
 }
@@ -249,7 +207,7 @@ export function subscribeReviews(onData: (reviews: Review[]) => void) {
       coll,
       (snapshot) => {
         if (snapshot.empty) {
-          onData(REVIEWS_DATA);
+          onData([]);
           return;
         }
         const list: Review[] = [];
@@ -260,12 +218,12 @@ export function subscribeReviews(onData: (reviews: Review[]) => void) {
       },
       (err) => {
         console.error('Firestore reviews listener error:', err);
-        onData(REVIEWS_DATA);
+        onData([]);
       }
     );
   } catch (err) {
     console.error('Failed to subscribe reviews:', err);
-    onData(REVIEWS_DATA);
+    onData([]);
     return () => {};
   }
 }
@@ -279,8 +237,9 @@ export function subscribeSupportTickets(
 ) {
   try {
     const coll = collection(db, TICKETS_COLLECTION);
+    const q = userId ? query(coll, where('userId', '==', userId)) : query(coll);
     return onSnapshot(
-      coll,
+      q,
       (snapshot) => {
         const list: SupportTicket[] = [];
         snapshot.forEach((docSnap) => {
@@ -290,10 +249,12 @@ export function subscribeSupportTickets(
       },
       (err) => {
         console.error('Firestore support tickets listener error:', err);
+        onData([]);
       }
     );
   } catch (err) {
     console.error('Failed to subscribe support tickets:', err);
+    onData([]);
     return () => {};
   }
 }
@@ -308,7 +269,7 @@ export async function createSupportTicketInFirestore(
   const docRef = doc(db, TICKETS_COLLECTION, ticket.id);
   await setDoc(docRef, {
     ...ticket,
-    userId: userId || 'demo-user-nashik',
+    userId: userId || 'guest_user',
     createdAt: new Date().toISOString(),
   });
 }

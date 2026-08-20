@@ -45,6 +45,16 @@ import {
   deleteAddressFromFirestore,
 } from './services/firebaseService';
 
+const DEFAULT_NASHIK_LOCATION: Address = {
+  id: 'current-loc',
+  title: 'Current Location',
+  line1: 'Indira Nagar',
+  locality: 'Indira Nagar',
+  city: 'Nashik',
+  pincode: '422009',
+  isDefault: true,
+};
+
 export default function App() {
   // Auth State
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null);
@@ -54,11 +64,10 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('home');
   const [currentRole, setCurrentRole] = useState<AppRole>('customer');
   const [savedAddresses, setSavedAddresses] = useState<Address[]>(DEFAULT_ADDRESSES);
-  const [currentAddress, setCurrentAddress] = useState<Address>(DEFAULT_ADDRESSES[0]);
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    { service: SERVICE_CATEGORIES[0].services[0], quantity: 1 },
-    { service: SERVICE_CATEGORIES[0].services[1], quantity: 1 },
-  ]);
+  const [currentAddress, setCurrentAddress] = useState<Address>(
+    DEFAULT_ADDRESSES[0] || DEFAULT_NASHIK_LOCATION
+  );
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [bookings, setBookings] = useState<Booking[]>(INITIAL_BOOKINGS);
   const [unreadNotificationCount, setUnreadNotificationCount] = useState<number>(0);
 
