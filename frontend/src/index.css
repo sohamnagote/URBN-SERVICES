@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #003d9b;
+  --color-primary-container: #0052cc;
+  --color-primary-fixed: #dae2ff;
+  --color-primary-fixed-dim: #b2c5ff;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #c4d2ff;
+  --color-on-primary-fixed: #001848;
+  --color-on-primary-fixed-variant: #0040a2;
+  --color-secondary: #006e2f;
+  --color-secondary-container: #6bff8f;
+  --color-secondary-fixed: #6bff8f;
+  --color-secondary-fixed-dim: #4ae176;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #007432;
+  --color-on-secondary-fixed: #002109;
+  --color-on-secondary-fixed-variant: #005321;
+  --color-tertiary: #35445a;
+  --color-tertiary-container: #4c5c72;
+  --color-tertiary-fixed: #d3e4fe;
+  --color-tertiary-fixed-dim: #b7c8e1;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-container: #c4d4ee;
+  --color-on-tertiary-fixed: #0b1c30;
+  --color-on-tertiary-fixed-variant: #38485d;
+  --color-surface: #f7f9fb;
+  --color-surface-bright: #f7f9fb;
+  --color-surface-dim: #d8dadc;
+  --color-surface-variant: #e0e3e5;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f2f4f6;
+  --color-surface-container: #eceef0;
+  --color-surface-container-high: #e6e8ea;
+  --color-surface-container-highest: #e0e3e5;
+  --color-surface-tint: #0c56d0;
+  --color-on-surface: #191c1e;
+  --color-on-surface-variant: #434654;
+  --color-outline: #737685;
+  --color-outline-variant: #c3c6d6;
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error: #ffffff;
+  --color-on-error-container: #93000a;
+  --color-background: #f7f9fb;
+  --color-on-background: #191c1e;
+  --color-inverse-surface: #2d3133;
+  --color-inverse-on-surface: #eff1f3;
+  --color-inverse-primary: #b2c5ff;
+
+  --spacing-container-margin-desktop: 48px;
+  --spacing-container-margin-mobile: 16px;
+  --spacing-section-gap: 32px;
+  --spacing-gutter: 16px;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+@media (min-width: 768px) {
+  .glass-panel {
+    background: #ffffff;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+.input-focus-ring:focus-within {
+  border-color: #003d9b;
+  border-width: 2px;
+}
